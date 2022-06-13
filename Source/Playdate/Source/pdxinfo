@@ -1,0 +1,6 @@
+name=MicroCity
+author=James Howard, Abeno Studio
+bundleID=com.abenokobo.microcity
+version=20220613
+imagePath=assets/launcher
+description=City simulator game for microcontrollers

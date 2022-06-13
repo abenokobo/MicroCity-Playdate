@@ -1,0 +1,13 @@
+[
+    {
+      "name": "Playdate Simulator",
+      "toolchainFile": "${workspaceFolder}/.vscode/playdate-simulator.cmake"
+    },
+    {
+      "name": "Playdate Device",
+      "toolchainFile": "${workspaceFolder}/.vscode/playdate-device.cmake"
+    }
+]
+
+
+

@@ -1,0 +1,1 @@
+local pd <const> = playdate
