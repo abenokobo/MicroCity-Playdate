@@ -1,6 +1,6 @@
 #pragma once
 
-#if _WIN32
+#if defined(_WIN32) || (_PLAYDATE)
 #include <stdint.h>
 #include <string.h>
 #define PROGMEM
@@ -17,7 +17,13 @@
 #define TILE_SIZE 8
 #define TILE_SIZE_SHIFT 3
 
-#ifdef _WIN32
+#ifdef _PLAYDATE
+#define DISPLAY_WIDTH 128
+#define DISPLAY_HEIGHT 80
+#define MAP_WIDTH 48
+#define MAP_HEIGHT 48
+
+#elif defined(_WIN32)
 //#define DISPLAY_WIDTH 192
 //#define DISPLAY_HEIGHT 192
 #define DISPLAY_WIDTH 128

@@ -5,7 +5,7 @@ PlaydateAPI* gpd = NULL;
 
 
 
-
+///
 static int update(__attribute__ ((unused)) void* ud)
 {
 	UpdateMicroCity();
@@ -13,14 +13,7 @@ static int update(__attribute__ ((unused)) void* ud)
 }
 
 
-static const LCDPattern bg = {
-    0, 0xff, 0, 0xff,
-	0, 0xff, 0, 0xff,
-    0xff, 0xff, 0xff, 0xff,
-	0xff, 0xff, 0xff, 0xff
-};
-
-
+///
 extern "C" int eventHandler
 (
 	  PlaydateAPI* playdate
@@ -33,7 +26,7 @@ extern "C" int eventHandler
 		gpd = playdate;
 
 		gpd->display->setRefreshRate(25); 
-		gpd->graphics->fillRect(0, 0, 400, 240, (LCDColor)&bg);
+		gpd->graphics->fillRect(0, 0, 400, 240, kColorBlack);
 		InitializeMicroCity();
 		gpd->system->setUpdateCallback(update, NULL);
 	}

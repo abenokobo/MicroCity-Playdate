@@ -2,9 +2,6 @@ cmake_minimum_required(VERSION 3.14)
 set (CMAKE_CXX_STANDARD 11)
 add_definitions(-D_PLAYDATE)
 
-# TODO
-add_definitions(-D_WIN32)
-
 if (APPLE)
     execute_process(
             COMMAND bash -c "egrep '^\\s*SDKRoot' $HOME/.Playdate/config"

@@ -66,7 +66,7 @@ void SaveCity()
 ///
 bool LoadCity()
 {
-    auto fs = gpd->file->open(DATA_FILE_NAME, kFileReadData);
+	auto fs = gpd->file->open(DATA_FILE_NAME, kFileReadData);
 	if (!fs)
 	{
 		return false;
@@ -144,18 +144,18 @@ uint8_t* GetPowerGrid()
 ///
 void InitializeMicroCity()
 {
-    m_bmp = gpd->graphics->newBitmap(DISPLAY_WIDTH, DISPLAY_HEIGHT, kColorBlack);
+	m_bmp = gpd->graphics->newBitmap(DISPLAY_WIDTH, DISPLAY_HEIGHT, kColorBlack);
 
-    int dummy;
-    gpd->graphics->getBitmapData(m_bmp, &dummy, &dummy, &dummy, &dummy, &m_data);
+	int dummy;
+	gpd->graphics->getBitmapData(m_bmp, &dummy, &dummy, &dummy, &dummy, &m_data);
 }
 
 
 ///
 void UpdateMicroCity()
 {
-    static const int POSX = (400 - (DISPLAY_WIDTH * PLAYDATE_ZOOM_SCALE)) / 2;
-    static const int POSY = (240 - (DISPLAY_HEIGHT * PLAYDATE_ZOOM_SCALE)) / 2;
+	static const int POSX = (400 - (DISPLAY_WIDTH * PLAYDATE_ZOOM_SCALE)) / 2;
+	static const int POSY = (240 - (DISPLAY_HEIGHT * PLAYDATE_ZOOM_SCALE)) / 2;
 
 	TickGame();
 
