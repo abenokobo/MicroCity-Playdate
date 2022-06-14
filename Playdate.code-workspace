@@ -3,6 +3,9 @@
         {
             "name": "Playdate",
             "path": "Source/Playdate"
+        },
+        {
+            "path": "Source/MicroCity"
         }
     ] 
 }
