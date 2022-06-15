@@ -4,10 +4,9 @@
 
 MicroCity is a city simulation game for the [Arduboy miniature game system](https://www.arduboy.com) inspired by SimCity
 
-## Build instructions
-To compile from source you will need the [Arduboy2 library](https://github.com/MLXXXp/Arduboy2) and the Arduino IDE
+MicroCity for Playdate is a forked from [jhhoward/MicroCity](https://github.com/jhhoward/MicroCity)
 
-Open /Source/MicroCity/MicroCity.ino in the Arduino IDE and hit build
+## Building MicroCity for Playdate
 
-## Flashing other games
-Note that there is a bug with the Arduboy bootloader when flashing new games. If flashing a new Arduino sketch after having previously flashing MicroCity, then first boot the Arduboy into *flashlight mode* by holding the up button whilst switching on the device.
+Open Playdate.code-workspace in Visual Studio Code to load the project for Playdate.
+
