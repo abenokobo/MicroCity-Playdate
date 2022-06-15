@@ -19,6 +19,14 @@ extern PlaydateAPI* gpd;
 #endif
 
 
+#include <assert.h>
+#include <memory>
+
+
+static const int PLAYDATE_ZOOM_SCALE = 3;
+
+
+
 #endif // __COMMON_H
 
 

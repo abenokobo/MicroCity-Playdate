@@ -1,14 +1,14 @@
 #include "PlaydateMain.h"
 
+
 PlaydateAPI* gpd = NULL;
-#include "Defines.h"
 
 
 
 ///
 static int update(__attribute__ ((unused)) void* ud)
 {
-	UpdateMicroCity();
+	MicroCity::GetInstance().Update();
 	return 1;
 }
 
@@ -27,8 +27,17 @@ extern "C" int eventHandler
 
 		gpd->display->setRefreshRate(25); 
 		gpd->graphics->fillRect(0, 0, 400, 240, kColorBlack);
-		InitializeMicroCity();
 		gpd->system->setUpdateCallback(update, NULL);
+
+		MicroCity::GetInstance().Initialize();
+	}
+	else if (event == kEventPause)
+	{
+		auto menuBmp = MicroCity::GetInstance().GetMenuBitmap();
+		if (menuBmp)
+		{
+			gpd->system->setMenuImage(menuBmp, 0);
+		}
 	}
 
 	return 0;

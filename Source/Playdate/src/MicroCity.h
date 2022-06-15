@@ -3,16 +3,40 @@
 
 
 #include "Common.h"
+#include "DrawLCDBitmap.h"
 
 
-static const int PLAYDATE_ZOOM_SCALE = 3;
+class MicroCity
+{
+private:
 
 
-///
-void InitializeMicroCity();
+    ///
+    static MicroCity m_goInstance;
 
-///
-void UpdateMicroCity();
+    ///
+    std::shared_ptr<DrawLCDBitmap> m_spDraw;
+
+    ///
+    MicroCity();
+
+
+
+public:
+
+
+    ///
+    void Initialize();
+
+    ///
+    void Update();
+
+    ///
+    LCDBitmap* GetMenuBitmap();
+
+    ///
+    static MicroCity& GetInstance();
+};
 
 
 #endif // __PLAYDATE_MICROCITY_H

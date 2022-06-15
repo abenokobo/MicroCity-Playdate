@@ -31,6 +31,8 @@ include_directories(
 
 set(SOURCE
     src/MicroCity.cpp
+    src/DrawLCDBitmap.cpp
+    src/DrawMap.cpp
     src/PlaydateMain.cpp
 
     ../MicroCity/Building.cpp
