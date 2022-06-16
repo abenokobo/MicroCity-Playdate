@@ -8,7 +8,8 @@ DrawLCDBitmap::DrawLCDBitmap(LCDBitmap* bmp)
 
     m_bmp = bmp;
 	int dummy;
-	gpd->graphics->getBitmapData(m_bmp, &dummy, &dummy, &m_rowBytes, &dummy, &m_buffer);
+	uint8_t* pdummy;
+	gpd->graphics->getBitmapData(m_bmp, &dummy, &dummy, &m_rowBytes, &pdummy, &m_buffer);
 }
 
 
