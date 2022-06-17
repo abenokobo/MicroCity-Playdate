@@ -7,19 +7,19 @@ DrawLCDBitmap::DrawLCDBitmap(LCDBitmap* bmp)
     assert(bmp);
 
     m_bmp = bmp;
-	int dummy;
-	uint8_t* pdummy;
-	gpd->graphics->getBitmapData(m_bmp, &dummy, &dummy, &m_rowBytes, &pdummy, &m_buffer);
+    int dummy;
+    uint8_t* pdummy;
+    gpd->graphics->getBitmapData(m_bmp, &dummy, &dummy, &m_rowBytes, &pdummy, &m_buffer);
 }
 
 
 ///
 DrawLCDBitmap::~DrawLCDBitmap()
 {
-	if (m_bmp)
-	{
-		gpd->graphics->freeBitmap(m_bmp);
-	}
+    if (m_bmp)
+    {
+        gpd->graphics->freeBitmap(m_bmp);
+    }
 }
 
 
@@ -28,9 +28,9 @@ void DrawLCDBitmap::PutPixel(uint8_t x, uint8_t y, uint8_t color)
 {
     assert(m_buffer != NULL);
 
-	uint8_t* block = m_buffer + (y * m_rowBytes) + (x / 8);
-	uint8_t data = 0x80 >> (x % 8);
-	*block = color ? *block | data : *block & ~data;
+    uint8_t* block = m_buffer + (y * m_rowBytes) + (x / 8);
+    uint8_t data = 0x80 >> (x % 8);
+    *block = color ? *block | data : *block & ~data;
 }
 
 
@@ -39,22 +39,22 @@ void DrawLCDBitmap::DrawBitmap(const uint8_t* src, uint8_t x, uint8_t y, uint8_t
 {
     assert(m_buffer != NULL);
 
-	for (int j = 0; j < h; j++)
-	{
-		for (int i = 0; i < w; i++)
-		{
-			int blockX = i / 8;
-			int blockY = j / 8;
-			int blocksPerWidth = w / 8;
-			int blockIndex = blockY * blocksPerWidth + blockX;
-			uint8_t pixels = src[blockIndex * 8 + i % 8];
-			uint8_t mask = 1 << (j % 8);
-			if (pixels & mask)
-			{
-				PutPixel(x + i, y + j, 1);
-			}
-		}
-	}
+    for (int j = 0; j < h; j++)
+    {
+        for (int i = 0; i < w; i++)
+        {
+            int blockX = i / 8;
+            int blockY = j / 8;
+            int blocksPerWidth = w / 8;
+            int blockIndex = blockY * blocksPerWidth + blockX;
+            uint8_t pixels = src[blockIndex * 8 + i % 8];
+            uint8_t mask = 1 << (j % 8);
+            if (pixels & mask)
+            {
+                PutPixel(x + i, y + j, 1);
+            }
+        }
+    }
 }
 
 

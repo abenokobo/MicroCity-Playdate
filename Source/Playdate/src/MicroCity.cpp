@@ -16,95 +16,95 @@ MicroCity MicroCity::m_goInstance;
 
 
 /*
-	Debug Function
+    Debug Function
 */
 
 
 void DebugBuildingScore(Building* building, int score, int crime, int pollution, int localInfluence, int populationEffect, int randomEffect)
 {
-	MicroCity::GetInstance().UpdateBuildingScore(building, score, crime, pollution, localInfluence, populationEffect, randomEffect);
+    MicroCity::GetInstance().UpdateBuildingScore(building, score, crime, pollution, localInfluence, populationEffect, randomEffect);
 }
 
 
 
 /*
-	Implements
+    Implements
 */
 
 
 //
 void SaveCity()
 {
-	auto fs = gpd->file->open(DATA_FILE_NAME, kFileWrite);
-	bool success = false;
-	if (fs)
-	{
-		if (gpd->file->write(fs, &State, STATE_SIZE) == STATE_SIZE)
-		{
-			success = true;
-		}
-		gpd->file->close(fs);
-	}
+    auto fs = gpd->file->open(DATA_FILE_NAME, kFileWrite);
+    bool success = false;
+    if (fs)
+    {
+        if (gpd->file->write(fs, &State, STATE_SIZE) == STATE_SIZE)
+        {
+            success = true;
+        }
+        gpd->file->close(fs);
+    }
 
-	if (!success)
-	{
-		gpd->system->logToConsole("SaveCity failed.");
-	}
+    if (!success)
+    {
+        gpd->system->logToConsole("SaveCity failed.");
+    }
 }
 
 
 ///
 bool LoadCity()
 {
-	auto fs = gpd->file->open(DATA_FILE_NAME, kFileReadData);
-	if (!fs)
-	{
-		return false;
-	}
+    auto fs = gpd->file->open(DATA_FILE_NAME, kFileReadData);
+    if (!fs)
+    {
+        return false;
+    }
 
-	if (gpd->file->read(fs, &State, STATE_SIZE) != STATE_SIZE)
-	{
-		gpd->file->close(fs);
-		return false;
-	}
-	gpd->file->close(fs);
+    if (gpd->file->read(fs, &State, STATE_SIZE) != STATE_SIZE)
+    {
+        gpd->file->close(fs);
+        return false;
+    }
+    gpd->file->close(fs);
 
-	if (State.timeToNextDisaster > MAX_TIME_BETWEEN_DISASTERS)
-	{
-		State.timeToNextDisaster = MIN_TIME_BETWEEN_DISASTERS;
-	}
-	return true;
+    if (State.timeToNextDisaster > MAX_TIME_BETWEEN_DISASTERS)
+    {
+        State.timeToNextDisaster = MIN_TIME_BETWEEN_DISASTERS;
+    }
+    return true;
 }
 
 
 ///
 void PutPixel(uint8_t x, uint8_t y, uint8_t color)
 {
-	MicroCity::GetInstance().PutPixel(x, y, color);
+    MicroCity::GetInstance().PutPixel(x, y, color);
 }
 
 
 ///
 void DrawBitmap(const uint8_t* data, uint8_t x, uint8_t y, uint8_t w, uint8_t h)
 {
-	MicroCity::GetInstance().DrawBitmap(data, x, y, w, h);
+    MicroCity::GetInstance().DrawBitmap(data, x, y, w, h);
 }
 
 
 ///
 uint8_t GetInput()
 {
-	static PDButtons btns;
-	gpd->system->getButtonState(&btns, NULL, NULL);
-	return btns;
+    static PDButtons btns;
+    gpd->system->getButtonState(&btns, NULL, NULL);
+    return btns;
 }
 
 
 ///
 uint8_t* GetPowerGrid()
 {
-	static uint8_t PowerGrid[DISPLAY_WIDTH * DISPLAY_HEIGHT / 8];
-	return PowerGrid;
+    static uint8_t PowerGrid[DISPLAY_WIDTH * DISPLAY_HEIGHT / 8];
+    return PowerGrid;
 }
 
 
@@ -116,65 +116,65 @@ MicroCity::MicroCity()
 
 
 /*
-	public
+    public
 */
 
 
 ///
 void MicroCity::Initialize()
 {
-	m_spCityInfo = std::make_shared<CityInfo>();
-	m_spDrawMap = std::make_shared<DrawMap>(m_spCityInfo);
-	m_spDraw = DrawLCDBitmap::CreateInstance(DISPLAY_WIDTH, DISPLAY_HEIGHT, kColorBlack);
-	m_spDrawMap->Initialize();
+    m_spCityInfo = std::make_shared<CityInfo>();
+    m_spDrawMap = std::make_shared<DrawMap>(m_spCityInfo);
+    m_spDraw = DrawLCDBitmap::CreateInstance(DISPLAY_WIDTH, DISPLAY_HEIGHT, kColorBlack);
+    m_spDrawMap->Initialize();
 }
 
 
 ///
 void MicroCity::Update()
 {
-	static const int POSX = (400 - (DISPLAY_WIDTH * PLAYDATE_ZOOM_SCALE)) / 2;
-	static const int POSY = (240 - (DISPLAY_HEIGHT * PLAYDATE_ZOOM_SCALE)) / 2;
+    static const int POSX = (400 - (DISPLAY_WIDTH * PLAYDATE_ZOOM_SCALE)) / 2;
+    static const int POSY = (240 - (DISPLAY_HEIGHT * PLAYDATE_ZOOM_SCALE)) / 2;
 
-	TickGame();
+    TickGame();
 
-	gpd->graphics->drawScaledBitmap(m_spDraw->GetLCDBitmap(), POSX, POSY, PLAYDATE_ZOOM_SCALE, PLAYDATE_ZOOM_SCALE);
-	//gpd->system->drawFPS(0,0);
+    gpd->graphics->drawScaledBitmap(m_spDraw->GetLCDBitmap(), POSX, POSY, PLAYDATE_ZOOM_SCALE, PLAYDATE_ZOOM_SCALE);
+    //gpd->system->drawFPS(0,0);
 }
 
 
 ///
 void MicroCity::PutPixel(uint8_t x, uint8_t y, uint8_t color)
 {
-	m_spDraw->PutPixel(x, y, color);
+    m_spDraw->PutPixel(x, y, color);
 }
 
 
 ///
 void MicroCity::DrawBitmap(const uint8_t* data, uint8_t x, uint8_t y, uint8_t w, uint8_t h)
 {
-	m_spDraw->DrawBitmap(data, x, y, w, h);
+    m_spDraw->DrawBitmap(data, x, y, w, h);
 }
 
 
 ///
 void MicroCity::UpdateBuildingScore(Building* building, int score, int crime, int pollution, int localInfluence, int populationEffect, int randomEffect)
 {
-	m_spCityInfo->UpdateBuildingScore(building, score, crime, pollution, localInfluence, populationEffect, randomEffect);
+    m_spCityInfo->UpdateBuildingScore(building, score, crime, pollution, localInfluence, populationEffect, randomEffect);
 }
 
 
 ///
 LCDBitmap* MicroCity::GetMenuBitmap()
 {
-	return m_spDrawMap->GetMenuBitmap();
+    return m_spDrawMap->GetMenuBitmap();
 }
 
 
 ///
 MicroCity& MicroCity::GetInstance()
 {
-	return m_goInstance;
+    return m_goInstance;
 }
 
 
