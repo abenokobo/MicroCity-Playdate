@@ -1,6 +1,6 @@
 #include "MicroCity.h"
 #include "Game.h"
-#include "DrawMap.h"
+
 
 
 ///
@@ -13,9 +13,6 @@ static const int STATE_SIZE = sizeof(GameState);
 ///
 MicroCity MicroCity::m_goInstance;
 
-///
-static std::shared_ptr<DrawLCDBitmap> m_gspDraw;
-
 
 
 /*
@@ -25,19 +22,7 @@ static std::shared_ptr<DrawLCDBitmap> m_gspDraw;
 
 void DebugBuildingScore(Building* building, int score, int crime, int pollution, int localInfluence, int populationEffect, int randomEffect)
 {
-	// for (int n = 0; n < MAX_BUILDINGS; n++)
-	// {
-	// 	if (building == &State.buildings[n])
-	// 	{
-	// 		BuildingDebugValues[n].score = score;
-	// 		BuildingDebugValues[n].crime = crime;
-	// 		BuildingDebugValues[n].pollution = pollution;
-	// 		BuildingDebugValues[n].localInfluence = localInfluence;
-	// 		BuildingDebugValues[n].populationEffect = populationEffect;
-	// 		BuildingDebugValues[n].randomEffect = randomEffect;
-	// 		return;
-	// 	}
-	// }
+	MicroCity::GetInstance().UpdateBuildingScore(building, score, crime, pollution, localInfluence, populationEffect, randomEffect);
 }
 
 
@@ -95,14 +80,14 @@ bool LoadCity()
 ///
 void PutPixel(uint8_t x, uint8_t y, uint8_t color)
 {
-	m_gspDraw->PutPixel(x, y, color);
+	MicroCity::GetInstance().PutPixel(x, y, color);
 }
 
 
 ///
 void DrawBitmap(const uint8_t* data, uint8_t x, uint8_t y, uint8_t w, uint8_t h)
 {
-	m_gspDraw->DrawBitmap(data, x, y, w, h);
+	MicroCity::GetInstance().DrawBitmap(data, x, y, w, h);
 }
 
 
@@ -138,11 +123,10 @@ MicroCity::MicroCity()
 ///
 void MicroCity::Initialize()
 {
+	m_spCityInfo = std::make_shared<CityInfo>();
+	m_spDrawMap = std::make_shared<DrawMap>(m_spCityInfo);
 	m_spDraw = DrawLCDBitmap::CreateInstance(DISPLAY_WIDTH, DISPLAY_HEIGHT, kColorBlack);
-
-	m_gspDraw = m_spDraw;
-
-	DrawMap::GetInstance().Initialize();
+	m_spDrawMap->Initialize();
 }
 
 
@@ -154,15 +138,36 @@ void MicroCity::Update()
 
 	TickGame();
 
-	gpd->graphics->drawScaledBitmap(m_gspDraw->GetLCDBitmap(), POSX, POSY, PLAYDATE_ZOOM_SCALE, PLAYDATE_ZOOM_SCALE);
+	gpd->graphics->drawScaledBitmap(m_spDraw->GetLCDBitmap(), POSX, POSY, PLAYDATE_ZOOM_SCALE, PLAYDATE_ZOOM_SCALE);
 	//gpd->system->drawFPS(0,0);
+}
+
+
+///
+void MicroCity::PutPixel(uint8_t x, uint8_t y, uint8_t color)
+{
+	m_spDraw->PutPixel(x, y, color);
+}
+
+
+///
+void MicroCity::DrawBitmap(const uint8_t* data, uint8_t x, uint8_t y, uint8_t w, uint8_t h)
+{
+	m_spDraw->DrawBitmap(data, x, y, w, h);
+}
+
+
+///
+void MicroCity::UpdateBuildingScore(Building* building, int score, int crime, int pollution, int localInfluence, int populationEffect, int randomEffect)
+{
+	m_spCityInfo->UpdateBuildingScore(building, score, crime, pollution, localInfluence, populationEffect, randomEffect);
 }
 
 
 ///
 LCDBitmap* MicroCity::GetMenuBitmap()
 {
-	return DrawMap::GetInstance().GetMenuBitmap();
+	return m_spDrawMap->GetMenuBitmap();
 }
 
 

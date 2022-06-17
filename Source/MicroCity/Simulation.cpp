@@ -12,7 +12,7 @@ enum SimulationSteps
 	SimulateNextMonth
 };
 
-#ifdef _WIN32
+#if defined(_WIN32) || (_PLAYDATE)
 void DebugBuildingScore(Building* building, int score, int crime, int pollution, int localInfluence, int populationEffect, int randomEffect);
 #else
 inline void DebugBuildingScore(Building* building, int score, int crime, int pollution, int localInfluence, int populationEffect, int randomEffect) {}

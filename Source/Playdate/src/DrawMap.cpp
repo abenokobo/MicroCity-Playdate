@@ -5,32 +5,22 @@
 
 
 
-DrawMap DrawMap::m_goInstance;
-
 
 ///
-DrawMap::DrawMap()
-: m_bmpMenu(NULL)
+void DrawMap::CreateTerrainBitmap(uint8_t terrainType)
 {
+    m_bmpTerrains[terrainType] = DrawLCDBitmap::CreateInstance(MAP_WIDTH, MAP_HEIGHT, kColorBlack);
+    m_bmpTerrains[terrainType]->DrawBitmap(GetTerrainData(terrainType), 0, 0, MAP_WIDTH, MAP_HEIGHT);
 }
 
 
 ///
-DrawMap::~DrawMap()
+void DrawMap::CreateTerrainBitmaps()
 {
-	if (m_bmpMenu)
-	{
-		gpd->graphics->freeBitmap(m_bmpMenu);
-	}
-}
-
-
-
-///
-void DrawMap::CreateCityDrawMap(uint8_t terrainType)
-{
-    m_bmpMaps[terrainType] = DrawLCDBitmap::CreateInstance(MAP_WIDTH, MAP_HEIGHT, kColorBlack);
-    m_bmpMaps[terrainType]->DrawBitmap(GetTerrainData(terrainType), 0, 0, MAP_WIDTH, MAP_HEIGHT);
+    for (uint8_t i = 0; i < MAP_COUNT; i++)
+    {
+        CreateTerrainBitmap(i);
+    }
 }
 
 
@@ -67,28 +57,74 @@ void DrawMap::DrawMapCursor(int mapLeft, int mapTop)
 }
 
 
+
+///
+DrawMap::DrawMap(const std::shared_ptr<CityInfo>& cityInfo)
+: m_spCityInfo(cityInfo)
+, m_bmpMap(NULL)
+, m_bmpMenu(NULL)
+{
+}
+
+
+///
+DrawMap::~DrawMap()
+{
+	if (m_bmpMenu)
+	{
+		gpd->graphics->freeBitmap(m_bmpMenu);
+	}
+}
+
+
 ///
 bool DrawMap::Initialize()
 {
+    m_bmpMap = gpd->graphics->newBitmap(MAP_WIDTH * PLAYDATE_ZOOM_SCALE, MAP_HEIGHT * PLAYDATE_ZOOM_SCALE, kColorWhite);
     m_bmpMenu = gpd->graphics->newBitmap(400, 240, kColorWhite);
-    if (!m_bmpMenu)
+    if (!m_bmpMap || !m_bmpMenu)
     {
         assert(false);
         return false;
     }
 
-    for (uint8_t i = 0; i < MAP_COUNT; i++)
-    {
-        CreateCityDrawMap(i);
-    }
+	CreateTerrainBitmaps();
     return true;
 }
 
 
 ///
-LCDBitmap* DrawMap::GetLCDBitmap(uint8_t terrainType)
+LCDBitmap* DrawMap::GetMapBitmap(uint8_t terrainType, MapInfo info)
 {
-    return m_bmpMaps[terrainType]->GetLCDBitmap();
+	gpd->graphics->pushContext(m_bmpMap);
+	gpd->graphics->drawScaledBitmap(
+		m_bmpTerrains[terrainType]->GetLCDBitmap(),
+		0, 0,
+		PLAYDATE_ZOOM_SCALE, PLAYDATE_ZOOM_SCALE);
+
+	switch (info)
+	{
+	case MapInfo_CityMap:
+		break;
+
+	case MapInfo_Population:
+		break;
+
+	case MapInfo_Crime:
+		m_spCityInfo->DrawCityInfo(CityInfoKind_Crime);
+		break;
+
+	case MapInfo_Pollution:
+		m_spCityInfo->DrawCityInfo(CityInfoKind_Pollution);
+		break;
+
+	case MapInfo_None:
+	default:
+		break;
+	}
+	gpd->graphics->popContext();
+
+    return m_bmpMap;
 }
 
 
@@ -122,10 +158,9 @@ LCDBitmap* DrawMap::GetMenuBitmap()
 			(MAP_HEIGHT * PLAYDATE_ZOOM_SCALE) + (MAP_MARGIN * 2),
 			kColorWhite);
 
-		gpd->graphics->drawScaledBitmap(
-			DrawMap::GetInstance().GetLCDBitmap(State.terrainType),
-			MAP_POSX, MAP_POSY,
-			PLAYDATE_ZOOM_SCALE, PLAYDATE_ZOOM_SCALE);
+		gpd->graphics->drawBitmap(
+			GetMapBitmap(State.terrainType, MapInfo_None),
+			MAP_POSX, MAP_POSY, kBitmapUnflipped);
 
         DrawMapCursor(MAP_POSX, MAP_POSY);
 
@@ -137,11 +172,7 @@ LCDBitmap* DrawMap::GetMenuBitmap()
 
 
 
-///
-DrawMap& DrawMap::GetInstance()
-{
-    return m_goInstance;
-}
+
 
 
 
