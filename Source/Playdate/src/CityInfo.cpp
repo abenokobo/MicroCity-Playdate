@@ -4,6 +4,48 @@
 
 
 ///
+CityOverview::CityOverview()
+{
+    Initialize();
+}
+
+
+///
+void CityOverview::Initialize()
+{
+    nPopulation = 0;
+
+    nResidential = 0;
+    nCommercial = 0;
+    nIndustrial = 0;
+
+    nPowerplant = 0;
+    nPark = 0;
+    nPoliceDept = 0;
+    nFireDept = 0;
+    nStadium = 0;
+
+    nRoads = 0;
+    nPowerline = 0;
+}
+
+
+#ifndef NDEBUG
+void CityOverview::DebugOut()
+{
+    gpd->system->logToConsole("=====");
+    gpd->system->logToConsole("Population %d", nPopulation);
+    gpd->system->logToConsole("R:%d C:%d I:%d", nResidential, nCommercial, nIndustrial);
+    gpd->system->logToConsole("PoliceDept:%d FireDept:%d Park:%d", nPoliceDept, nFireDept, nPark);
+    gpd->system->logToConsole("Powerplant:%d Stadium:%d", nPowerplant, nStadium);
+}
+#endif
+
+
+
+
+
+///
 void CityInfo::ClearCityInfo()
 {
     gpd->graphics->pushContext(m_bmpWork);
@@ -107,8 +149,68 @@ void CityInfo::DrawCityInfo(CityInfoKind kind)
 }
 
 
+///
+const CityOverview& CityInfo::GetCityOverview()
+{
+    m_oOverview.Initialize();
 
+	for (int n = 0; n < MAX_BUILDINGS; n++)
+	{
+        Building& bld = State.buildings[n];
+        m_oOverview.nPopulation += bld.populationDensity;
 
+    #ifndef NDEBUG
+        if (bld.populationDensity != 0)
+        {
+            if (bld.type != Residential && bld.type != Industrial && bld.type != Commercial)
+            {
+                assert(false);
+            }
+        }
+    #endif
 
+		switch (bld.type)
+		{
+		case Residential:
+            m_oOverview.nResidential++;
+			break;
 
+		case Industrial:
+            m_oOverview.nIndustrial++;
+			break;
 
+		case Commercial:
+            m_oOverview.nCommercial++;
+			break;
+
+        case Powerplant:
+            m_oOverview.nPowerplant++;
+            break;
+        
+        case Park:
+            m_oOverview.nPark++;
+            break;
+        
+        case PoliceDept:
+            m_oOverview.nPoliceDept++;
+            break;
+        
+        case FireDept:
+            m_oOverview.nFireDept++;
+            break;
+        
+        case Stadium:
+            m_oOverview.nStadium++;
+            break;
+
+		default:
+			break;
+		}
+	}
+
+#ifndef NDEBUG
+    m_oOverview.DebugOut();
+#endif
+
+    return m_oOverview;
+}

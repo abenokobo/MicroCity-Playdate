@@ -1,5 +1,13 @@
 #include "MicroCity.h"
+#include "Interface.h"
 #include "Game.h"
+
+
+/*
+    CAPI 'playdate->system->addMenuItem' callback function is not called,
+    so implemented in Lua.
+*/
+//#define USE_CAPI_MENU
 
 
 
@@ -107,10 +115,32 @@ uint8_t* GetPowerGrid()
     return PowerGrid;
 }
 
+#ifdef USE_CAPI_MENU
+///
+static void _OnMenuCityInfo(void* ud)
+{
+    MicroCity::GetInstance().OnMenuCityInfo();
+}
+#else
+///
+static int _OnMenuCityInfo_FromLua(lua_State* L)
+{
+    MicroCity::GetInstance().OnMenuCityInfo();
+    return 0;
+}
+#endif
+
 
 ///
 MicroCity::MicroCity()
 {
+}
+
+
+///
+LCDBitmap* MicroCity::GetMenuBitmap()
+{
+    return m_spDrawMap->GetMenuBitmap();
 }
 
 
@@ -140,6 +170,41 @@ void MicroCity::Update()
 
     gpd->graphics->drawScaledBitmap(m_spDraw->GetLCDBitmap(), POSX, POSY, PLAYDATE_ZOOM_SCALE, PLAYDATE_ZOOM_SCALE);
     //gpd->system->drawFPS(0,0);
+
+    if (!m_bStarted)
+    {
+        if (UIState.state != StartScreen && UIState.state != NewCityMenu)
+        {
+            m_bStarted = true;
+
+            #ifdef USE_CAPI_MENU
+                gpd->system->addMenuItem("city info", _OnMenuCityInfo, NULL);
+            #else
+                const char* outerr = NULL;
+                gpd->lua->pushString("city info");
+                gpd->lua->pushFunction(_OnMenuCityInfo_FromLua);
+                gpd->lua->callFunction("_addMenuFromLua", 2, &outerr);
+            #endif
+        }
+    }
+}
+
+
+///
+void MicroCity::OnPause()
+{
+    auto menuBmp = GetMenuBitmap();
+    if (menuBmp)
+    {
+        gpd->system->setMenuImage(menuBmp, 0);
+    }
+}
+
+
+///
+void MicroCity::OnMenuCityInfo()
+{
+    auto overview = m_spCityInfo->GetCityOverview();
 }
 
 
@@ -161,13 +226,6 @@ void MicroCity::DrawBitmap(const uint8_t* data, uint8_t x, uint8_t y, uint8_t w,
 void MicroCity::UpdateBuildingScore(Building* building, int score, int crime, int pollution, int localInfluence, int populationEffect, int randomEffect)
 {
     m_spCityInfo->UpdateBuildingScore(building, score, crime, pollution, localInfluence, populationEffect, randomEffect);
-}
-
-
-///
-LCDBitmap* MicroCity::GetMenuBitmap()
-{
-    return m_spDrawMap->GetMenuBitmap();
 }
 
 

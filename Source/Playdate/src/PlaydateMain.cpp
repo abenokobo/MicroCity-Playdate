@@ -33,11 +33,7 @@ extern "C" int eventHandler
     }
     else if (event == kEventPause)
     {
-        auto menuBmp = MicroCity::GetInstance().GetMenuBitmap();
-        if (menuBmp)
-        {
-            gpd->system->setMenuImage(menuBmp, 0);
-        }
+        MicroCity::GetInstance().OnPause();
     }
 
     return 0;

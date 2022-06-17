@@ -18,6 +18,9 @@ private:
     static MicroCity m_goInstance;
 
     ///
+    bool m_bStarted;
+
+    ///
     std::shared_ptr<CityInfo> m_spCityInfo;
     
     ///
@@ -28,6 +31,9 @@ private:
 
     ///
     MicroCity();
+
+    ///
+    LCDBitmap* GetMenuBitmap();
 
 
 
@@ -41,6 +47,12 @@ public:
     void Update();
 
     ///
+    void OnPause();
+
+    ///
+    void OnMenuCityInfo();
+
+    ///
     void PutPixel(uint8_t x, uint8_t y, uint8_t color);
 
     ///
@@ -48,9 +60,6 @@ public:
 
     ///
     void UpdateBuildingScore(Building* building, int score, int crime, int pollution, int localInfluence, int populationEffect, int randomEffect);
-
-    ///
-    LCDBitmap* GetMenuBitmap();
 
     ///
     static MicroCity& GetInstance();
