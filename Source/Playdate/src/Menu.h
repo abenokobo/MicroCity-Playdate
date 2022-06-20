@@ -25,9 +25,6 @@ private:
     ///
     LCDBitmap* m_bmpMenu;
 
-    ///
-    void DrawMapCursor(int mapLeft, int mapTop);
-
 
 
 public:

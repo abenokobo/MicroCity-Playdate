@@ -47,23 +47,23 @@ bool CityOverview::IsBuildings(int x, int y)
 ///
 void CityOverview::UpdateBuildingsOverview()
 {
-	for (int n = 0; n < MAX_BUILDINGS; n++)
-	{
+    for (int n = 0; n < MAX_BUILDINGS; n++)
+    {
         Building& bld = State.buildings[n];
 
-		switch (bld.type)
-		{
-		case Residential:
+        switch (bld.type)
+        {
+        case Residential:
             nResidential++;
-			break;
+            break;
 
-		case Industrial:
+        case Industrial:
             nIndustrial++;
-			break;
+            break;
 
-		case Commercial:
+        case Commercial:
             nCommercial++;
-			break;
+            break;
 
         case Powerplant:
             nPowerplant++;
@@ -85,10 +85,10 @@ void CityOverview::UpdateBuildingsOverview()
             nStadium++;
             break;
 
-		default:
-			break;
-		}
-	}
+        default:
+            break;
+        }
+    }
 }
 
 

@@ -3,40 +3,6 @@
 
 
 
-
-
-///
-void Menu::DrawMapCursor(int mapLeft, int mapTop)
-{
-    ///
-    static const LCDPattern cursor = {
-        0b10101010,
-        0b01010101,
-        0b10101010,
-        0b01010101,
-        0b10101010,
-        0b01010101,
-        0b10101010,
-        0b01010101,
-
-        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-    };
-
-    int tileScrollX = (UIState.scrollX + 4) >> TILE_SIZE_SHIFT;
-    int tileScrollY = (UIState.scrollY + 4) >> TILE_SIZE_SHIFT;
-
-    for (int i = 0; i < PLAYDATE_ZOOM_SCALE; i++)
-    {
-        gpd->graphics->drawRect(
-            mapLeft + (tileScrollX * PLAYDATE_ZOOM_SCALE) + i,
-            mapTop + (tileScrollY * PLAYDATE_ZOOM_SCALE) + i,
-            (DISPLAY_WIDTH / TILE_SIZE) * PLAYDATE_ZOOM_SCALE - (i * 2),
-            (DISPLAY_HEIGHT / TILE_SIZE) * PLAYDATE_ZOOM_SCALE - (i * 2),
-            (LCDColor)cursor);
-    }
-}
-
-
 ///
 Menu::Menu()
 : m_bmpMenu(NULL)
