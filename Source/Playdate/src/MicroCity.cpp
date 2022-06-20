@@ -19,7 +19,7 @@ static const int STATE_SIZE = sizeof(GameState);
 
 
 ///
-MicroCity MicroCity::m_goInstance;
+std::shared_ptr<MicroCity> MicroCity::m_gspInstance;
 
 
 
@@ -133,14 +133,8 @@ static int _OnMenuCityInfo_FromLua(lua_State* L)
 
 ///
 MicroCity::MicroCity()
+: m_bStarted(false)
 {
-}
-
-
-///
-LCDBitmap* MicroCity::GetMenuBitmap()
-{
-    return m_spDrawMap->GetMenuBitmap();
 }
 
 
@@ -151,24 +145,40 @@ LCDBitmap* MicroCity::GetMenuBitmap()
 
 
 ///
+MicroCity::~MicroCity()
+{
+    m_spBuildingScore = NULL;
+    m_spMenu = NULL;
+    m_spDrawDisplay = NULL;
+}
+
+
+///
 void MicroCity::Initialize()
 {
-    m_spCityInfo = std::make_shared<CityInfo>();
-    m_spDrawMap = std::make_shared<DrawMap>(m_spCityInfo);
-    m_spDraw = DrawLCDBitmap::CreateInstance(DISPLAY_WIDTH, DISPLAY_HEIGHT, kColorBlack);
-    m_spDrawMap->Initialize();
+    m_spBuildingScore = std::make_shared<BuildingScore>();
+    m_spMenu = std::make_shared<Menu>();
+    m_spMenu->Initialize(m_spBuildingScore);
+    m_spDrawDisplay = DrawLCDBitmap::CreateInstance(DISPLAY_WIDTH, DISPLAY_HEIGHT, kColorBlack);
 }
 
 
 ///
 void MicroCity::Update()
 {
+    auto info = m_spMenu->GetCityInfo();
+    if (info)
+    {
+        info->Update();
+        return;
+    }
+
     static const int POSX = (400 - (DISPLAY_WIDTH * PLAYDATE_ZOOM_SCALE)) / 2;
     static const int POSY = (240 - (DISPLAY_HEIGHT * PLAYDATE_ZOOM_SCALE)) / 2;
 
     TickGame();
 
-    gpd->graphics->drawScaledBitmap(m_spDraw->GetLCDBitmap(), POSX, POSY, PLAYDATE_ZOOM_SCALE, PLAYDATE_ZOOM_SCALE);
+    gpd->graphics->drawScaledBitmap(m_spDrawDisplay->GetLCDBitmap(), POSX, POSY, PLAYDATE_ZOOM_SCALE, PLAYDATE_ZOOM_SCALE);
     //gpd->system->drawFPS(0,0);
 
     if (!m_bStarted)
@@ -193,9 +203,11 @@ void MicroCity::Update()
 ///
 void MicroCity::OnPause()
 {
-    auto menuBmp = GetMenuBitmap();
+    m_spMenu->OnExitCityInfo();
+    auto menuBmp = m_spMenu->GetMenuBitmap();
     if (menuBmp)
     {
+        gpd->graphics->drawBitmap(menuBmp, 0, 0, kBitmapUnflipped);
         gpd->system->setMenuImage(menuBmp, 0);
     }
 }
@@ -204,35 +216,51 @@ void MicroCity::OnPause()
 ///
 void MicroCity::OnMenuCityInfo()
 {
-    auto overview = m_spCityInfo->GetCityOverview();
+    m_spMenu->OnMenuCityInfo();
+}
+
+
+///
+void MicroCity::OnExitCityInfo()
+{
+    m_spMenu->OnExitCityInfo();
 }
 
 
 ///
 void MicroCity::PutPixel(uint8_t x, uint8_t y, uint8_t color)
 {
-    m_spDraw->PutPixel(x, y, color);
+    m_spDrawDisplay->PutPixel(x, y, color);
 }
 
 
 ///
 void MicroCity::DrawBitmap(const uint8_t* data, uint8_t x, uint8_t y, uint8_t w, uint8_t h)
 {
-    m_spDraw->DrawBitmap(data, x, y, w, h);
+    m_spDrawDisplay->DrawBitmap(data, x, y, w, h);
 }
 
 
 ///
 void MicroCity::UpdateBuildingScore(Building* building, int score, int crime, int pollution, int localInfluence, int populationEffect, int randomEffect)
 {
-    m_spCityInfo->UpdateBuildingScore(building, score, crime, pollution, localInfluence, populationEffect, randomEffect);
+    m_spBuildingScore->UpdateBuildingScore(building, score, crime, pollution, localInfluence, populationEffect, randomEffect);
 }
 
 
 ///
 MicroCity& MicroCity::GetInstance()
 {
-    return m_goInstance;
+    if (m_gspInstance == NULL)
+    {
+        m_gspInstance = std::shared_ptr<MicroCity>(new MicroCity());
+    }
+    return *m_gspInstance;
 }
 
 
+///
+void MicroCity::Finalize()
+{
+    m_gspInstance = NULL;
+}

@@ -4,8 +4,9 @@
 
 #include "Common.h"
 #include "DrawLCDBitmap.h"
+#include "Menu.h"
 #include "CityInfo.h"
-#include "DrawMap.h"
+#include "BuildingScore.h"
 
 
 
@@ -15,30 +16,33 @@ private:
 
 
     ///
-    static MicroCity m_goInstance;
+    static std::shared_ptr<MicroCity> m_gspInstance;
 
     ///
     bool m_bStarted;
 
     ///
     std::shared_ptr<CityInfo> m_spCityInfo;
-    
-    ///
-    std::shared_ptr<DrawMap> m_spDrawMap;
 
     ///
-    std::shared_ptr<DrawLCDBitmap> m_spDraw;
+    std::shared_ptr<BuildingScore> m_spBuildingScore;
+
+    ///
+    std::shared_ptr<Menu> m_spMenu;
+
+    ///
+    std::shared_ptr<DrawLCDBitmap> m_spDrawDisplay;
 
     ///
     MicroCity();
-
-    ///
-    LCDBitmap* GetMenuBitmap();
 
 
 
 public:
 
+
+    ///
+    ~MicroCity();
 
     ///
     void Initialize();
@@ -53,6 +57,9 @@ public:
     void OnMenuCityInfo();
 
     ///
+    void OnExitCityInfo();
+
+    ///
     void PutPixel(uint8_t x, uint8_t y, uint8_t color);
 
     ///
@@ -63,6 +70,9 @@ public:
 
     ///
     static MicroCity& GetInstance();
+
+    ///
+    static void Finalize();
 };
 
 

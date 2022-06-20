@@ -31,8 +31,12 @@ include_directories(
 
 set(SOURCE
     src/Dithering.cpp
+    src/BuildingScore.cpp
     src/CityInfo.cpp
+    src/CityOverview.cpp
+
     src/DrawLCDBitmap.cpp
+    src/Menu.cpp
     src/DrawMap.cpp
     src/MicroCity.cpp
     src/PlaydateMain.cpp

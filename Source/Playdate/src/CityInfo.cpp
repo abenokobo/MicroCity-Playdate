@@ -1,216 +1,246 @@
 #include "CityInfo.h"
-#include "Dithering.h"
+#include "MicroCity.h"
+
+
+static const int MAP_BITMAP_WIDTH = 200;
+static const int MAP_BITMAP_HEIGHT = 240;
+
+static const int MAP_TEXT_POSY = 16;
+
+static const int MAP_POSX = 28;
+static const int MAP_POSY = 48;
 
 
 
 ///
-CityOverview::CityOverview()
+void CityInfo::DrawContextCurrentMap()
 {
-    Initialize();
-}
-
-
-///
-void CityOverview::Initialize()
-{
-    nPopulation = 0;
-
-    nResidential = 0;
-    nCommercial = 0;
-    nIndustrial = 0;
-
-    nPowerplant = 0;
-    nPark = 0;
-    nPoliceDept = 0;
-    nFireDept = 0;
-    nStadium = 0;
-
-    nRoads = 0;
-    nPowerline = 0;
-}
-
-
-#ifndef NDEBUG
-void CityOverview::DebugOut()
-{
-    gpd->system->logToConsole("=====");
-    gpd->system->logToConsole("Population %d", nPopulation);
-    gpd->system->logToConsole("R:%d C:%d I:%d", nResidential, nCommercial, nIndustrial);
-    gpd->system->logToConsole("PoliceDept:%d FireDept:%d Park:%d", nPoliceDept, nFireDept, nPark);
-    gpd->system->logToConsole("Powerplant:%d Stadium:%d", nPowerplant, nStadium);
-}
-#endif
-
-
-
-
-
-///
-void CityInfo::ClearCityInfo()
-{
-    gpd->graphics->pushContext(m_bmpWork);
-    gpd->graphics->clear(kColorBlack);
-    gpd->graphics->popContext();
-
-    gpd->graphics->pushContext(m_bmpCityInfo);
-    gpd->graphics->clear(kColorClear);
-    gpd->graphics->popContext();
-
-    ::memset(&m_grayCityInfo, 0, sizeof(uint8_t) * INFO_WIDTH * INFO_HEIGHT);
-}
-
-
-///
-void CityInfo::PutCityInfo(uint8_t x, uint8_t y, uint8_t score)
-{
-    int nX = x * PLAYDATE_ZOOM_SCALE;
-    int nY = y * PLAYDATE_ZOOM_SCALE;
-    for (int i = 0; i < PLAYDATE_ZOOM_SCALE * 3; i++)
+    gpd->graphics->setFont(m_opFontTitle);
+    for (int i = 0; i < MAP_INFO_COUNT; i++)
     {
-        for (int j = 0; j < PLAYDATE_ZOOM_SCALE * 3; j++)
+        auto bmp = gpd->graphics->newBitmap(MAP_BITMAP_WIDTH, MAP_BITMAP_HEIGHT, kColorWhite);
+        gpd->graphics->pushContext(bmp);
+        
+        auto width = gpd->graphics->getTextWidth(m_opFontTitle, MAP_DESCS[i], strlen(MAP_DESCS[i]), kASCIIEncoding, 0);
+        gpd->graphics->drawText(MAP_DESCS[i], strlen(MAP_DESCS[i]), kASCIIEncoding,
+            ((400 - MAP_BITMAP_WIDTH) / 2) - (width / 2), MAP_TEXT_POSY);
+
+        m_spDrawMap->DrawCurrentMap(MAP_INFOS[i], MAP_POSX, MAP_POSY);
+
+        gpd->graphics->popContext();
+        m_opMaps[i] = bmp;
+    }
+}
+
+
+
+static const int OVERVIEW_BITMAP_WIDTH = 200;
+static const int OVERVIEW_BITMAP_HEIGHT = 240;
+
+static const int OVERVIEW_TEXT_LEFT = 10;
+static const int OVERVIEW_TEXT_TOP = 7;
+
+static const int OVERVIEW_TEXT_XPOS = 100;
+static const int OVERVIEW_TEXT_MARGIN_WIDTH = 10;
+static const int OVERVIEW_TEXT_HEIGHT = 16;
+static const int OVERVIEW_BREAK_HEIGHT = 7;
+
+
+///
+void CityInfo::DrawOverviewText(const char* szTitle, const char* szDsc, bool breakY, int& x, int& y)
+{
+    auto width = gpd->graphics->getTextWidth(m_opFontTitle, szTitle, strlen(szTitle), kASCIIEncoding, 0);
+    gpd->graphics->drawText(szTitle, strlen(szTitle), kASCIIEncoding, x + OVERVIEW_TEXT_XPOS - width, y);
+    gpd->graphics->drawText(szDsc, strlen(szDsc), kASCIIEncoding, x + OVERVIEW_TEXT_XPOS + OVERVIEW_TEXT_MARGIN_WIDTH, y);
+
+    y += OVERVIEW_TEXT_HEIGHT;
+    if (breakY)
+    {
+        y += OVERVIEW_BREAK_HEIGHT;
+    }
+}
+
+
+///
+void CityInfo::DrawContextCityOverview()
+{
+    m_opOverview = gpd->graphics->newBitmap(OVERVIEW_BITMAP_WIDTH, OVERVIEW_BITMAP_HEIGHT, kColorWhite);
+    gpd->graphics->pushContext(m_opOverview);
+
+    gpd->graphics->setFont(m_opFontOverview);
+
+    static char szBuf[255];
+    int x = OVERVIEW_TEXT_LEFT;
+    int y = OVERVIEW_TEXT_TOP;
+
+    int nOther =
+        m_spCityOverview->nPowerplant +
+        m_spCityOverview->nPark +
+        m_spCityOverview->nPoliceDept +
+        m_spCityOverview->nFireDept +
+        m_spCityOverview->nStadium;
+
+    int nTotal =
+        m_spCityOverview->nResidential +
+        m_spCityOverview->nCommercial +
+        m_spCityOverview->nIndustrial +
+        nOther;
+
+    int nPerResidential = nTotal == 0 ? 0 : (int)((m_spCityOverview->nResidential / (float)nTotal) * 100.f);
+    int nPerCommercial = nTotal == 0 ? 0 : (int)((m_spCityOverview->nCommercial / (float)nTotal) * 100.f);
+    int nPerIndustrial = nTotal == 0 ? 0 : (int)((m_spCityOverview->nIndustrial / (float)nTotal) * 100.f);
+    int nPerOther = nTotal == 0 ? 0 : (int)((nOther / (float)nTotal) * 100.f);
+
+    sprintf(szBuf, "%d", m_spCityOverview->nPopulation);
+    DrawOverviewText("Population :", szBuf, true, x, y);
+
+
+    sprintf(szBuf, "%d (%d%%)", m_spCityOverview->nResidential, nPerResidential);
+    DrawOverviewText("Residential :", szBuf, false, x, y);
+
+    sprintf(szBuf, "%d (%d%%)", m_spCityOverview->nCommercial, nPerCommercial);
+    DrawOverviewText("Commercial :", szBuf, false, x, y);
+
+    sprintf(szBuf, "%d (%d%%)", m_spCityOverview->nIndustrial, nPerIndustrial);
+    DrawOverviewText("Industrial :", szBuf, false, x, y);
+
+    sprintf(szBuf, "%d (%d%%)", nOther, nPerOther);
+    DrawOverviewText("Other :", szBuf, false, x, y);
+
+    sprintf(szBuf, "%d", nTotal);
+    DrawOverviewText("Total :", szBuf, true, x, y);
+
+
+    sprintf(szBuf, "%d", m_spCityOverview->nPark);
+    DrawOverviewText("Park :", szBuf, false, x, y);
+
+    sprintf(szBuf, "%d", m_spCityOverview->nPoliceDept);
+    DrawOverviewText("PoliceDept :", szBuf, false, x, y);
+
+    sprintf(szBuf, "%d", m_spCityOverview->nFireDept);
+    DrawOverviewText("FireDept :", szBuf, false, x, y);
+
+    sprintf(szBuf, "%d", m_spCityOverview->nStadium);
+    DrawOverviewText("Stadium :", szBuf, false, x, y);
+
+    sprintf(szBuf, "%d", m_spCityOverview->nPowerplant);
+    DrawOverviewText("Powerplant :", szBuf, true, x, y);
+
+
+    sprintf(szBuf, "%d", m_spCityOverview->nRoads);
+    DrawOverviewText("Roads :", szBuf, false, x, y);
+
+    sprintf(szBuf, "%d", m_spCityOverview->nPowerline);
+    DrawOverviewText("Powerline :", szBuf, false, x, y);
+
+    gpd->graphics->popContext();
+}
+
+
+///
+void CityInfo::DrawCurrentMap()
+{
+    gpd->graphics->drawBitmap(m_opMaps[m_nMapSelected], 200, 0, kBitmapUnflipped);
+}
+
+
+///
+void CityInfo::DrawCityOverview()
+{
+    gpd->graphics->drawBitmap(m_opOverview, 0, 0, kBitmapUnflipped);
+}
+
+
+///
+void CityInfo::DrawCityInfo()
+{
+    gpd->graphics->clear(kColorWhite);
+    DrawCurrentMap();
+    DrawCityOverview();
+}
+
+
+
+///
+CityInfo::CityInfo(const std::shared_ptr<DrawMap>& drawMap)
+: m_opFontTitle(NULL)
+, m_opFontOverview(NULL)
+, m_spDrawMap(drawMap)
+, m_opOverview(NULL)
+, m_nMapSelected(0)
+{
+    // TODO cache font
+    const char* err = NULL;
+    m_opFontTitle = gpd->graphics->loadFont("assets/fonts/font-Cuberick-Bold", &err);
+    m_opFontOverview = gpd->graphics->loadFont("assets/fonts/font-Cuberick-Bold", &err);
+    m_spCityOverview = std::make_shared<CityOverview>();
+    m_spCityOverview->UpdateOverview();
+}
+
+
+///
+CityInfo::~CityInfo()
+{
+    gpd->graphics->freeBitmap(m_opOverview);
+    for (int i = 0; i < MAP_INFO_COUNT; i++)
+    {
+        gpd->graphics->freeBitmap(m_opMaps[i]);
+    }
+}
+
+
+///
+const MapInfo CityInfo::MAP_INFOS[MAP_INFO_COUNT] = {
+    MapInfo_PopulationDestiny,
+    MapInfo_Crime,
+    MapInfo_Pollution,
+};
+
+
+///
+const char* CityInfo::MAP_DESCS[MAP_INFO_COUNT] = {
+    "POPULATION DESTINY",
+    "CRIME",
+    "POLLUTION",
+};
+
+
+///
+void CityInfo::Initialize()
+{
+    DrawContextCurrentMap();
+    DrawContextCityOverview();
+}
+
+
+///
+void CityInfo::Update()
+{
+    DrawCityInfo();
+    
+    static PDButtons pressed, released;
+    gpd->system->getButtonState(NULL, &pressed, &released);
+    if ((pressed & kButtonUp) == kButtonUp)
+    {
+        m_nMapSelected--;
+        if (m_nMapSelected < 0)
         {
-            m_grayCityInfo[nX + i + ((nY + j) * INFO_WIDTH)] = score;
+            m_nMapSelected = 0;
         }
     }
-}
-
-
-///
-void CityInfo::UpdateCityInfo(CityInfoKind kind)
-{
-    ClearCityInfo();
-    for (int n = 0; n < MAX_BUILDINGS; n++)
+    else if ((pressed & kButtonDown) == kButtonDown)
     {
-        PutCityInfo(State.buildings[n].x, State.buildings[n].y, m_buildingScore[n][kind]);
-    }
-}
-
-
-
-///
-CityInfo::CityInfo()
-: m_bmpWork(NULL)
-, m_bmpCityInfo(NULL)
-{
-    ::memset(&m_buildingScore, 0, sizeof(int) * MAX_BUILDINGS * CityInfoKind_COUNT);
-}
-
-
-///
-void CityInfo::UpdateBuildingScore(Building* building, int score, int crime, int pollution, int localInfluence, int populationEffect, int randomEffect)
-{
-    for (int n = 0; n < MAX_BUILDINGS; n++)
-    {
-        if (building == &State.buildings[n])
+        m_nMapSelected++;
+        if (m_nMapSelected > MAP_INFO_COUNT - 1)
         {
-            m_buildingScore[n][CityInfoKind_Crime] = crime < 0xff ? crime : 0xff;
-            m_buildingScore[n][CityInfoKind_Pollution] = pollution < 0xff ? pollution : 0xff;
-            return;
+            m_nMapSelected = MAP_INFO_COUNT - 1;
         }
     }
-}
-
-
-///
-void CityInfo::DrawCityInfo(CityInfoKind kind)
-{
-    if (m_bmpCityInfo == NULL)
+    else if ((released & kButtonB) == kButtonB)
     {
-        m_bmpWork = gpd->graphics->newBitmap(MAP_WIDTH * PLAYDATE_ZOOM_SCALE, MAP_HEIGHT * PLAYDATE_ZOOM_SCALE, kColorBlack);
-        m_bmpCityInfo = gpd->graphics->newBitmap(MAP_WIDTH * PLAYDATE_ZOOM_SCALE, MAP_HEIGHT * PLAYDATE_ZOOM_SCALE, kColorClear);
+        MicroCity::GetInstance().OnExitCityInfo();
     }
-    assert(m_bmpWork != NULL);
-    assert(m_bmpCityInfo != NULL);
-
-    UpdateCityInfo(kind);
-
-    int dummy;
-    uint8_t* pdummy;
-    int rowBytes = 0;
-    uint8_t* dstBuf = NULL;
-    gpd->graphics->getBitmapData(m_bmpWork, &dummy, &dummy, &rowBytes, &pdummy, &dstBuf);
-    Dithering::FloydSteinberg(m_grayCityInfo, INFO_WIDTH, INFO_HEIGHT, dstBuf, rowBytes, false);
-
-    gpd->graphics->pushContext(m_bmpCityInfo);
-    gpd->graphics->setDrawMode(kDrawModeInverted);
-    gpd->graphics->drawBitmap(m_bmpWork, 0, 0, kBitmapUnflipped);
-    gpd->graphics->popContext();
-
-    gpd->graphics->setDrawMode(kDrawModeWhiteTransparent);
-    gpd->graphics->drawBitmap(m_bmpCityInfo, 0, 0, kBitmapUnflipped);
-    gpd->graphics->setDrawMode(kDrawModeCopy);
-
-#if 0
-    gpd->lua->pushBitmap(m_bmpCityInfo);
-    gpd->lua->pushString("debug.gif");
-    const char* outerr = NULL;
-    gpd->lua->callFunction("playdate.datastore.writeImage", 2, &outerr);
-#endif
 }
 
 
-///
-const CityOverview& CityInfo::GetCityOverview()
-{
-    m_oOverview.Initialize();
 
-	for (int n = 0; n < MAX_BUILDINGS; n++)
-	{
-        Building& bld = State.buildings[n];
-        m_oOverview.nPopulation += bld.populationDensity;
-
-    #ifndef NDEBUG
-        if (bld.populationDensity != 0)
-        {
-            if (bld.type != Residential && bld.type != Industrial && bld.type != Commercial)
-            {
-                assert(false);
-            }
-        }
-    #endif
-
-		switch (bld.type)
-		{
-		case Residential:
-            m_oOverview.nResidential++;
-			break;
-
-		case Industrial:
-            m_oOverview.nIndustrial++;
-			break;
-
-		case Commercial:
-            m_oOverview.nCommercial++;
-			break;
-
-        case Powerplant:
-            m_oOverview.nPowerplant++;
-            break;
-        
-        case Park:
-            m_oOverview.nPark++;
-            break;
-        
-        case PoliceDept:
-            m_oOverview.nPoliceDept++;
-            break;
-        
-        case FireDept:
-            m_oOverview.nFireDept++;
-            break;
-        
-        case Stadium:
-            m_oOverview.nStadium++;
-            break;
-
-		default:
-			break;
-		}
-	}
-
-#ifndef NDEBUG
-    m_oOverview.DebugOut();
-#endif
-
-    return m_oOverview;
-}

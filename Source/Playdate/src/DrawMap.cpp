@@ -25,6 +25,37 @@ void DrawMap::CreateTerrainBitmaps()
 
 
 ///
+void DrawMap::DrawMapFrame(int mapLeft, int mapTop)
+{
+    static const int MAP_BORDER = 3;
+    static const int MAP_MARGIN = 3;
+
+    gpd->graphics->fillRect(
+        mapLeft - MAP_BORDER - MAP_MARGIN,
+        mapTop - MAP_BORDER - MAP_MARGIN,
+        (MAP_WIDTH * PLAYDATE_ZOOM_SCALE) + ((MAP_BORDER + MAP_MARGIN) * 2),
+        (MAP_HEIGHT * PLAYDATE_ZOOM_SCALE) + ((MAP_BORDER + MAP_MARGIN) * 2),
+        kColorBlack);
+    
+    gpd->graphics->fillRect(
+        mapLeft - MAP_MARGIN,
+        mapTop - MAP_MARGIN,
+        (MAP_WIDTH * PLAYDATE_ZOOM_SCALE) + (MAP_MARGIN * 2),
+        (MAP_HEIGHT * PLAYDATE_ZOOM_SCALE) + (MAP_MARGIN * 2),
+        kColorWhite);
+}
+
+
+///
+void DrawMap::DrawCurrentTerrain(int mapLeft, int mapTop)
+{
+    gpd->graphics->drawScaledBitmap(
+        m_bmpTerrains[State.terrainType]->GetLCDBitmap(),
+        mapLeft, mapTop, PLAYDATE_ZOOM_SCALE, PLAYDATE_ZOOM_SCALE);
+}
+
+
+///
 static const LCDPattern cursor = {
     0b10101010,
     0b01010101,
@@ -59,10 +90,7 @@ void DrawMap::DrawMapCursor(int mapLeft, int mapTop)
 
 
 ///
-DrawMap::DrawMap(const std::shared_ptr<CityInfo>& cityInfo)
-: m_spCityInfo(cityInfo)
-, m_bmpMap(NULL)
-, m_bmpMenu(NULL)
+DrawMap::DrawMap()
 {
 }
 
@@ -70,104 +98,44 @@ DrawMap::DrawMap(const std::shared_ptr<CityInfo>& cityInfo)
 ///
 DrawMap::~DrawMap()
 {
-    if (m_bmpMenu)
-    {
-        gpd->graphics->freeBitmap(m_bmpMenu);
-    }
 }
 
 
 ///
-bool DrawMap::Initialize()
+bool DrawMap::Initialize(const std::shared_ptr<BuildingScore>& buildingScore)
 {
-    m_bmpMap = gpd->graphics->newBitmap(MAP_WIDTH * PLAYDATE_ZOOM_SCALE, MAP_HEIGHT * PLAYDATE_ZOOM_SCALE, kColorWhite);
-    m_bmpMenu = gpd->graphics->newBitmap(400, 240, kColorWhite);
-    if (!m_bmpMap || !m_bmpMenu)
-    {
-        assert(false);
-        return false;
-    }
-
+    m_spBuildingScore = buildingScore;
     CreateTerrainBitmaps();
     return true;
 }
 
 
 ///
-LCDBitmap* DrawMap::GetMapBitmap(uint8_t terrainType, MapInfo info)
+void DrawMap::DrawCurrentMap(MapInfo info, int mapLeft, int mapTop)
 {
-    gpd->graphics->pushContext(m_bmpMap);
-    gpd->graphics->drawScaledBitmap(
-        m_bmpTerrains[terrainType]->GetLCDBitmap(),
-        0, 0,
-        PLAYDATE_ZOOM_SCALE, PLAYDATE_ZOOM_SCALE);
+    DrawMapFrame(mapLeft, mapTop);
+    DrawCurrentTerrain(mapLeft, mapTop);
 
     switch (info)
     {
-    case MapInfo_CityMap:
-        break;
-
-    case MapInfo_Population:
+    case MapInfo_PopulationDestiny:
+        m_spBuildingScore->DrawBuildingScore(BuildingScoreKind_PopulationDestiny, mapLeft, mapTop);
         break;
 
     case MapInfo_Crime:
-        m_spCityInfo->DrawCityInfo(CityInfoKind_Crime);
+        m_spBuildingScore->DrawBuildingScore(BuildingScoreKind_Crime, mapLeft, mapTop);
         break;
 
     case MapInfo_Pollution:
-        m_spCityInfo->DrawCityInfo(CityInfoKind_Pollution);
+        m_spBuildingScore->DrawBuildingScore(BuildingScoreKind_Pollution, mapLeft, mapTop);
         break;
 
     case MapInfo_None:
     default:
         break;
     }
-    gpd->graphics->popContext();
 
-    return m_bmpMap;
-}
-
-
-
-static const int MAP_POSX = 28;
-static const int MAP_POSY = 48;
-static const int MAP_BORDER = 3;
-static const int MAP_MARGIN = 3;
-
-
-
-///
-LCDBitmap* DrawMap::GetMenuBitmap()
-{
-    if (UIState.state != StartScreen && UIState.state != NewCityMenu)
-    {
-        gpd->graphics->pushContext(m_bmpMenu);
-        gpd->graphics->clear(kColorWhite);
-
-        gpd->graphics->fillRect(
-            MAP_POSX - MAP_BORDER - MAP_MARGIN,
-            MAP_POSY - MAP_BORDER - MAP_MARGIN,
-            (MAP_WIDTH * PLAYDATE_ZOOM_SCALE) + ((MAP_BORDER + MAP_MARGIN) * 2),
-            (MAP_HEIGHT * PLAYDATE_ZOOM_SCALE) + ((MAP_BORDER + MAP_MARGIN) * 2),
-            kColorBlack);
-        
-        gpd->graphics->fillRect(
-            MAP_POSX - MAP_MARGIN,
-            MAP_POSY - MAP_MARGIN,
-            (MAP_WIDTH * PLAYDATE_ZOOM_SCALE) + (MAP_MARGIN * 2),
-            (MAP_HEIGHT * PLAYDATE_ZOOM_SCALE) + (MAP_MARGIN * 2),
-            kColorWhite);
-
-        gpd->graphics->drawBitmap(
-            GetMapBitmap(State.terrainType, MapInfo_None),
-            MAP_POSX, MAP_POSY, kBitmapUnflipped);
-
-        DrawMapCursor(MAP_POSX, MAP_POSY);
-
-        gpd->graphics->popContext();
-        return m_bmpMenu;
-    }
-    return NULL;
+    DrawMapCursor(mapLeft, mapTop);
 }
 
 

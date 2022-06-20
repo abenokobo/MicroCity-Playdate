@@ -1,9 +1,9 @@
-#ifndef __MAP_BITMAP_H
-#define __MAP_BITMAP_H
+#ifndef __DRAW_MAP_H
+#define __DRAW_MAP_H
 
 
 #include "Common.h"
-#include "CityInfo.h"
+#include "BuildingScore.h"
 
 
 
@@ -13,10 +13,10 @@ class DrawLCDBitmap;
 enum MapInfo
 {
     MapInfo_None,
-    MapInfo_CityMap,
-    MapInfo_Population,
+    MapInfo_PopulationDestiny,
     MapInfo_Crime,
     MapInfo_Pollution,
+    MapInfo_COUNT
 };
 
 
@@ -30,16 +30,13 @@ private:
     static const int MAP_COUNT = 3;
 
     ///
-    std::shared_ptr<CityInfo> m_spCityInfo;
+    std::shared_ptr<BuildingScore> m_spBuildingScore;
 
     ///
     std::shared_ptr<DrawLCDBitmap> m_bmpTerrains[MAP_COUNT];
 
-    ///
-    LCDBitmap* m_bmpMap;
 
-    ///
-    LCDBitmap* m_bmpMenu;
+
 
     ///
     void CreateTerrainBitmap(uint8_t terrainType);
@@ -47,6 +44,12 @@ private:
     ///
     void CreateTerrainBitmaps();
 
+    ///
+    void DrawMapFrame(int mapLeft, int mapTop);
+
+    ///
+    void DrawCurrentTerrain(int mapLeft, int mapTop);
+    
     ///
     void DrawMapCursor(int mapLeft, int mapTop);
 
@@ -56,23 +59,21 @@ public:
 
 
     ///
-    DrawMap(const std::shared_ptr<CityInfo>& cityInfo);
+    DrawMap();
 
     ///
     ~DrawMap();
 
     ///
-    bool Initialize();
+    bool Initialize(const std::shared_ptr<BuildingScore>& buildingScore);
 
     ///
-    LCDBitmap* GetMapBitmap(uint8_t terrainType, MapInfo info);
-
-    ///
-    LCDBitmap* GetMenuBitmap();
+    void DrawCurrentMap(MapInfo info, int mapLeft, int mapTop);
 };
 
 
-#endif // __MAP_BITMAP_H
+
+#endif // __DRAW_MAP_H
 
 
 

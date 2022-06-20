@@ -35,6 +35,10 @@ extern "C" int eventHandler
     {
         MicroCity::GetInstance().OnPause();
     }
+    else if (event == kEventTerminate)
+    {
+        MicroCity::Finalize();
+    }
 
     return 0;
 }
