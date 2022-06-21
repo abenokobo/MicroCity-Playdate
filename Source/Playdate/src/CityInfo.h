@@ -38,9 +38,6 @@ private:
     LCDBitmap* m_opMaps[MAP_INFO_COUNT];
 
     ///
-    int m_nMapSelected;
-
-    ///
     void DrawContextCurrentMap();
 
     ///
@@ -57,6 +54,33 @@ private:
 
     ///
     void DrawCityInfo();
+
+
+    ///
+    int m_nMapSelected;
+    LCDBitmap* m_opMapCurrent;
+    LCDBitmap* m_opMapLast;
+    int m_nStartPosY;
+    int m_nEndPosY;
+    unsigned int m_nCurrentTime;
+
+    ///
+    void SelectPreviousMap();
+
+    ///
+    void SelectNextMap();
+
+    ///
+    void UpdateSelectedMap(int index);
+
+    ///
+    int GetCurrentMapPosY();
+
+    ///
+    LCDBitmap* m_opMapCursor;
+
+    ///
+    void DrawMapCursor();
 
 
 

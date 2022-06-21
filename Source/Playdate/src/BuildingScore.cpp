@@ -72,6 +72,11 @@ BuildingScore::~BuildingScore()
 }
 
 
+
+// from Simulation.cpp
+static const float SIM_MAX_CRIME = 50.0f;
+
+
 ///
 void BuildingScore::UpdateBuildingScore(Building* building, int score, int crime, int pollution, int localInfluence, int populationEffect, int randomEffect)
 {
@@ -81,7 +86,10 @@ void BuildingScore::UpdateBuildingScore(Building* building, int score, int crime
         {
             int populationDensity = (building->populationDensity + 1) << 4;
             m_buildingScore[n][BuildingScoreKind_PopulationDestiny] = populationDensity < 0xff ? populationDensity : 0xff;
-            m_buildingScore[n][BuildingScoreKind_Crime] = crime < 0xff ? crime : 0xff;
+
+            int recCrime = static_cast<int>((crime / SIM_MAX_CRIME) * 0xff);
+            m_buildingScore[n][BuildingScoreKind_Crime] = recCrime < 0xff ? recCrime : 0xff;
+
             m_buildingScore[n][BuildingScoreKind_Pollution] = pollution < 0xff ? pollution : 0xff;
             return;
         }

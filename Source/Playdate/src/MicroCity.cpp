@@ -178,6 +178,7 @@ void MicroCity::Update()
 
     TickGame();
 
+    gpd->graphics->clear(kColorBlack);
     gpd->graphics->drawScaledBitmap(m_spDrawDisplay->GetLCDBitmap(), POSX, POSY, PLAYDATE_ZOOM_SCALE, PLAYDATE_ZOOM_SCALE);
     //gpd->system->drawFPS(0,0);
 
