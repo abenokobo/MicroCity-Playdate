@@ -2,6 +2,7 @@
 #define __CITY_INFO_H
 
 
+#include <string>
 #include "Common.h"
 #include "DrawMap.h"
 #include "CityOverview.h"
@@ -14,10 +15,19 @@ private:
 
 
     ///
-    LCDFont* m_opFontTitle;
+    LCDFont* m_fntTitle;
 
     ///
-    LCDFont* m_opFontOverview;
+    LCDFont* m_fntOverview;
+
+    ///
+    LCDBitmap* m_bmpFrame;
+
+    ///
+    LCDBitmap* m_bmpLoading;
+
+    ///
+    LCDBitmap* m_bmpMapCursor;
 
     ///
     std::shared_ptr<DrawMap> m_spDrawMap;
@@ -32,10 +42,10 @@ private:
     static const char* MAP_DESCS[MAP_INFO_COUNT];
 
     ///
-    LCDBitmap* m_opOverview;
+    LCDBitmap* m_bmpOverview;
 
     ///
-    LCDBitmap* m_opMaps[MAP_INFO_COUNT];
+    LCDBitmap* m_bmpMaps[MAP_INFO_COUNT];
 
     ///
     void DrawContextCurrentMap();
@@ -53,13 +63,16 @@ private:
     void DrawCityOverview();
 
     ///
+    void DrawNowLoading();
+
+    ///
     void DrawCityInfo();
 
 
     ///
     int m_nMapSelected;
-    LCDBitmap* m_opMapCurrent;
-    LCDBitmap* m_opMapLast;
+    LCDBitmap* m_bmpMapCurrent;
+    LCDBitmap* m_bmpMapLast;
     int m_nStartPosY;
     int m_nEndPosY;
     unsigned int m_nCurrentTime;
@@ -77,9 +90,6 @@ private:
     int GetCurrentMapPosY();
 
     ///
-    LCDBitmap* m_opMapCursor;
-
-    ///
     void DrawMapCursor();
 
 
@@ -94,7 +104,7 @@ public:
     ~CityInfo();
 
     ///
-    void Initialize();
+    void InitializeCityInfo();
 
     ///
     void Update();

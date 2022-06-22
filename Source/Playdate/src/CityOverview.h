@@ -11,7 +11,6 @@ class CityOverview
 private:
 
 
-
 #ifndef NDEBUG
     void DebugOut();
 #endif
@@ -24,6 +23,9 @@ private:
 
     ///
     void UpdatConnectionsOverview();
+
+    ///
+    void InitializeOverview();
 
 
 
@@ -47,9 +49,6 @@ public:
 
     ///
     CityOverview();
-
-    ///
-    void ClearOverview();
 
     ///
     void UpdateOverview();

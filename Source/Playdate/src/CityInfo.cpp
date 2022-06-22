@@ -16,19 +16,16 @@ static const int MAP_POSY = 59;
 ///
 void CityInfo::DrawContextCurrentMap()
 {
-    const char* err = NULL;
-    auto bmpFrame = gpd->graphics->loadBitmap("assets/images/frame", &err);
-
-    gpd->graphics->setFont(m_opFontTitle);
+    gpd->graphics->setFont(m_fntTitle);
     for (int i = 0; i < MAP_INFO_COUNT; i++)
     {
-        auto bmp = gpd->graphics->newBitmap(MAP_BITMAP_WIDTH, MAP_BITMAP_HEIGHT, kColorWhite);
+        auto bmp = m_bmpMaps[i];
         gpd->graphics->pushContext(bmp);
-        gpd->graphics->drawBitmap(bmpFrame, 0, 0, kBitmapUnflipped);
+        gpd->graphics->drawBitmap(m_bmpFrame, 0, 0, kBitmapUnflipped);
         
         const char* text = MAP_DESCS[i];
         size_t len = strlen(text);
-        auto width = gpd->graphics->getTextWidth(m_opFontTitle, text, len, kASCIIEncoding, 0);
+        auto width = gpd->graphics->getTextWidth(m_fntTitle, text, len, kASCIIEncoding, 0);
         int x = (MAP_BITMAP_WIDTH / 2) - (width / 2);
         
         gpd->graphics->fillRect(
@@ -41,10 +38,7 @@ void CityInfo::DrawContextCurrentMap()
         m_spDrawMap->DrawCurrentMap(MAP_INFOS[i], MAP_POSX, MAP_POSY);
 
         gpd->graphics->popContext();
-        m_opMaps[i] = bmp;
     }
-
-    gpd->graphics->freeBitmap(bmpFrame);
 }
 
 
@@ -64,7 +58,7 @@ static const int OVERVIEW_BREAK_HEIGHT = 7;
 ///
 void CityInfo::DrawOverviewText(const char* szTitle, const char* szDsc, bool breakY, int& x, int& y)
 {
-    auto width = gpd->graphics->getTextWidth(m_opFontTitle, szTitle, strlen(szTitle), kASCIIEncoding, 0);
+    auto width = gpd->graphics->getTextWidth(m_fntTitle, szTitle, strlen(szTitle), kASCIIEncoding, 0);
     gpd->graphics->drawText(szTitle, strlen(szTitle), kASCIIEncoding, x + OVERVIEW_TEXT_XPOS - width, y);
     gpd->graphics->drawText(szDsc, strlen(szDsc), kASCIIEncoding, x + OVERVIEW_TEXT_XPOS + OVERVIEW_TEXT_MARGIN_WIDTH, y);
 
@@ -76,13 +70,31 @@ void CityInfo::DrawOverviewText(const char* szTitle, const char* szDsc, bool bre
 }
 
 
+
+///
+static const char* TTL_Population   = "Population :";
+static const char* TTL_Residential  = "Residential :";
+static const char* TTL_Commercial   = "Commercial :";
+static const char* TTL_Industrial   = "Industrial :";
+static const char* TTL_Other        = "Other :";
+static const char* TTL_Total        = "Total :";
+static const char* TTL_Park         = "Park :";
+static const char* TTL_PoliceDept   = "PoliceDept :";
+static const char* TTL_FireDept     = "FireDept :";
+static const char* TTL_Stadium      = "Stadium :";
+static const char* TTL_Powerplant   = "Powerplant :";
+static const char* TTL_Roads        = "Roads :";
+static const char* TTL_Powerline    = "Powerline :";
+
+
+
 ///
 void CityInfo::DrawContextCityOverview()
 {
-    m_opOverview = gpd->graphics->newBitmap(OVERVIEW_BITMAP_WIDTH, OVERVIEW_BITMAP_HEIGHT, kColorWhite);
-    gpd->graphics->pushContext(m_opOverview);
+    gpd->graphics->pushContext(m_bmpOverview);
 
-    gpd->graphics->setFont(m_opFontOverview);
+    gpd->graphics->clear(kColorWhite);
+    gpd->graphics->setFont(m_fntOverview);
 
     static char szBuf[255];
     int x = OVERVIEW_TEXT_LEFT;
@@ -107,46 +119,46 @@ void CityInfo::DrawContextCityOverview()
     int nPerOther = nTotal == 0 ? 0 : (int)((nOther / (float)nTotal) * 100.f);
 
     sprintf(szBuf, "%d", m_spCityOverview->nPopulation);
-    DrawOverviewText("Population :", szBuf, true, x, y);
+    DrawOverviewText(TTL_Population, szBuf, true, x, y);
 
 
     sprintf(szBuf, "%d (%d%%)", m_spCityOverview->nResidential, nPerResidential);
-    DrawOverviewText("Residential :", szBuf, false, x, y);
+    DrawOverviewText(TTL_Residential, szBuf, false, x, y);
 
     sprintf(szBuf, "%d (%d%%)", m_spCityOverview->nCommercial, nPerCommercial);
-    DrawOverviewText("Commercial :", szBuf, false, x, y);
+    DrawOverviewText(TTL_Commercial, szBuf, false, x, y);
 
     sprintf(szBuf, "%d (%d%%)", m_spCityOverview->nIndustrial, nPerIndustrial);
-    DrawOverviewText("Industrial :", szBuf, false, x, y);
+    DrawOverviewText(TTL_Industrial, szBuf, false, x, y);
 
     sprintf(szBuf, "%d (%d%%)", nOther, nPerOther);
-    DrawOverviewText("Other :", szBuf, false, x, y);
+    DrawOverviewText(TTL_Other, szBuf, false, x, y);
 
     sprintf(szBuf, "%d", nTotal);
-    DrawOverviewText("Total :", szBuf, true, x, y);
+    DrawOverviewText(TTL_Total, szBuf, true, x, y);
 
 
     sprintf(szBuf, "%d", m_spCityOverview->nPark);
-    DrawOverviewText("Park :", szBuf, false, x, y);
+    DrawOverviewText(TTL_Park, szBuf, false, x, y);
 
     sprintf(szBuf, "%d", m_spCityOverview->nPoliceDept);
-    DrawOverviewText("PoliceDept :", szBuf, false, x, y);
+    DrawOverviewText(TTL_PoliceDept, szBuf, false, x, y);
 
     sprintf(szBuf, "%d", m_spCityOverview->nFireDept);
-    DrawOverviewText("FireDept :", szBuf, false, x, y);
+    DrawOverviewText(TTL_FireDept, szBuf, false, x, y);
 
     sprintf(szBuf, "%d", m_spCityOverview->nStadium);
-    DrawOverviewText("Stadium :", szBuf, false, x, y);
+    DrawOverviewText(TTL_Stadium, szBuf, false, x, y);
 
     sprintf(szBuf, "%d", m_spCityOverview->nPowerplant);
-    DrawOverviewText("Powerplant :", szBuf, true, x, y);
+    DrawOverviewText(TTL_Powerplant, szBuf, true, x, y);
 
 
     sprintf(szBuf, "%d", m_spCityOverview->nRoads);
-    DrawOverviewText("Roads :", szBuf, false, x, y);
+    DrawOverviewText(TTL_Roads, szBuf, false, x, y);
 
     sprintf(szBuf, "%d", m_spCityOverview->nPowerline);
-    DrawOverviewText("Powerline :", szBuf, false, x, y);
+    DrawOverviewText(TTL_Powerline, szBuf, false, x, y);
 
     gpd->graphics->popContext();
 }
@@ -155,23 +167,23 @@ void CityInfo::DrawContextCityOverview()
 ///
 void CityInfo::DrawCurrentMap()
 {
-    if (!m_opMapCurrent)
+    if (!m_bmpMapCurrent)
     {
         assert(false);
         return;
     }
 
     int posY = GetCurrentMapPosY();
-    gpd->graphics->drawBitmap(m_opMapCurrent, OVERVIEW_BITMAP_WIDTH, posY, kBitmapUnflipped);
+    gpd->graphics->drawBitmap(m_bmpMapCurrent, OVERVIEW_BITMAP_WIDTH, posY, kBitmapUnflipped);
 
-    if (m_opMapLast)
+    if (m_bmpMapLast)
     {
         int prePosY = posY - 240;
         if (posY < 0)
         {
             prePosY =posY + 240;
         }
-        gpd->graphics->drawBitmap(m_opMapLast, OVERVIEW_BITMAP_WIDTH, prePosY, kBitmapUnflipped);
+        gpd->graphics->drawBitmap(m_bmpMapLast, OVERVIEW_BITMAP_WIDTH, prePosY, kBitmapUnflipped);
     }
 
     DrawMapCursor();
@@ -181,7 +193,7 @@ void CityInfo::DrawCurrentMap()
 ///
 void CityInfo::DrawCityOverview()
 {
-    gpd->graphics->drawBitmap(m_opOverview, 0, 0, kBitmapUnflipped);
+    gpd->graphics->drawBitmap(m_bmpOverview, 0, 0, kBitmapUnflipped);
 }
 
 
@@ -189,8 +201,68 @@ void CityInfo::DrawCityOverview()
 void CityInfo::DrawCityInfo()
 {
     gpd->graphics->clear(kColorWhite);
+    if (m_spCityOverview)
+    {
+        m_spCityOverview->UpdateOverview();
+        DrawContextCurrentMap();
+        DrawContextCityOverview();
+        UpdateSelectedMap(0);
+        m_spCityOverview = NULL;
+    }
+
     DrawCurrentMap();
     DrawCityOverview();
+}
+
+
+///
+static const LCDPattern bg = {
+    0b10101010,
+    0b01010101,
+    0b10101010,
+    0b01010101,
+    0b10101010,
+    0b01010101,
+    0b10101010,
+    0b01010101,
+
+    0b01010101,
+    0b10101010,
+    0b01010101,
+    0b10101010,
+    0b01010101,
+    0b10101010,
+    0b01010101,
+    0b10101010,
+};
+
+
+///
+void CityInfo::DrawNowLoading()
+{
+    gpd->graphics->clear(kColorWhite);
+    gpd->graphics->setFont(m_fntOverview);
+
+    int x = OVERVIEW_TEXT_LEFT;
+    int y = OVERVIEW_TEXT_TOP;
+
+    DrawOverviewText(TTL_Population, "-", true, x, y);
+    DrawOverviewText(TTL_Residential, "-", false, x, y);
+    DrawOverviewText(TTL_Commercial, "-", false, x, y);
+    DrawOverviewText(TTL_Industrial, "-", false, x, y);
+    DrawOverviewText(TTL_Other, "-", false, x, y);
+    DrawOverviewText(TTL_Total, "-", true, x, y);
+    DrawOverviewText(TTL_Park, "-", false, x, y);
+    DrawOverviewText(TTL_PoliceDept, "-", false, x, y);
+    DrawOverviewText(TTL_FireDept, "-", false, x, y);
+    DrawOverviewText(TTL_Stadium, "-", false, x, y);
+    DrawOverviewText(TTL_Powerplant, "-", true, x, y);
+    DrawOverviewText(TTL_Roads, "-", false, x, y);
+    DrawOverviewText(TTL_Powerline, "-", false, x, y);
+
+    gpd->graphics->drawBitmap(m_bmpFrame, OVERVIEW_BITMAP_WIDTH, 0, kBitmapUnflipped);
+    gpd->graphics->fillRect(0, 0, 400, 240, (LCDColor)bg);
+    gpd->graphics->drawBitmap(m_bmpLoading, 200 - 9, 120 - 13, kBitmapUnflipped);
 }
 
 
@@ -221,13 +293,13 @@ void CityInfo::SelectNextMap()
 ///
 void CityInfo::UpdateSelectedMap(int index)
 {
-    if (m_opMapCurrent)
+    if (m_bmpMapCurrent)
     {
-        m_opMapLast = m_opMapCurrent;
+        m_bmpMapLast = m_bmpMapCurrent;
     }
-    m_opMapCurrent = m_opMaps[index];
+    m_bmpMapCurrent = m_bmpMaps[index];
 
-    if (m_opMapLast)
+    if (m_bmpMapLast)
     {
         m_nCurrentTime = gpd->system->getCurrentTimeMilliseconds();
     }
@@ -256,7 +328,7 @@ static const int SCROLL_TIME  = 500;
 ///
 int CityInfo::GetCurrentMapPosY()
 {
-    if (!m_opMapLast)
+    if (!m_bmpMapLast)
     {
         return 0;
     }
@@ -264,7 +336,7 @@ int CityInfo::GetCurrentMapPosY()
     auto time = gpd->system->getCurrentTimeMilliseconds() - m_nCurrentTime;
     if (time > SCROLL_TIME)
     {
-        m_opMapLast = NULL;
+        m_bmpMapLast = NULL;
         return 0;
     }
 
@@ -273,6 +345,7 @@ int CityInfo::GetCurrentMapPosY()
     float t = (time / static_cast<float>(SCROLL_TIME)) - 1;
     return static_cast<int>(diff * (t * t * t + 1)) + m_nStartPosY;
 }
+
 
 
 ///
@@ -284,7 +357,7 @@ static const int MAP_CURSOR_DOWN_Y = 227;
 ///
 void CityInfo::DrawMapCursor()
 {
-    if (m_opMapLast)
+    if (m_bmpMapLast)
     {
         return;
     }
@@ -297,13 +370,13 @@ void CityInfo::DrawMapCursor()
     // previous
     if (m_nMapSelected != 0)
     {
-        gpd->graphics->drawBitmap(m_opMapCursor, MAP_CURSOR_X, MAP_CURSOR_UP_Y, kBitmapUnflipped);
+        gpd->graphics->drawBitmap(m_bmpMapCursor, MAP_CURSOR_X, MAP_CURSOR_UP_Y, kBitmapUnflipped);
     }
 
     // next
     if (m_nMapSelected != MAP_INFO_COUNT - 1)
     {
-        gpd->graphics->drawBitmap(m_opMapCursor, MAP_CURSOR_X, MAP_CURSOR_DOWN_Y, kBitmapFlippedY);
+        gpd->graphics->drawBitmap(m_bmpMapCursor, MAP_CURSOR_X, MAP_CURSOR_DOWN_Y, kBitmapFlippedY);
     }
 }
 
@@ -311,35 +384,45 @@ void CityInfo::DrawMapCursor()
 
 ///
 CityInfo::CityInfo(const std::shared_ptr<DrawMap>& drawMap)
-: m_opFontTitle(NULL)
-, m_opFontOverview(NULL)
+: m_fntTitle(NULL)
+, m_fntOverview(NULL)
+, m_bmpFrame(NULL)
+, m_bmpLoading(NULL)
+, m_bmpMapCursor(NULL)
 , m_spDrawMap(drawMap)
-, m_opOverview(NULL)
+, m_bmpOverview(NULL)
 , m_nMapSelected(0)
-, m_opMapCurrent(NULL)
-, m_opMapLast(NULL)
+, m_bmpMapCurrent(NULL)
+, m_bmpMapLast(NULL)
 , m_nStartPosY(0)
 , m_nEndPosY(0)
 , m_nCurrentTime(0)
-, m_opMapCursor(NULL)
 {
     const char* err = NULL;
-    m_opFontTitle = gpd->graphics->loadFont("assets/fonts/font-Cuberick-Bold", &err);
-    m_opFontOverview = gpd->graphics->loadFont("assets/fonts/font-Cuberick-Bold", &err);
-    m_spCityOverview = std::make_shared<CityOverview>();
-    m_spCityOverview->UpdateOverview();
-    m_opMapCursor = gpd->graphics->loadBitmap("assets/images/cursor", &err);
+    m_fntTitle = gpd->graphics->loadFont("assets/fonts/font-Cuberick-Bold", &err);
+    m_fntOverview = gpd->graphics->loadFont("assets/fonts/font-Cuberick-Bold", &err);
+
+    m_bmpFrame = gpd->graphics->loadBitmap("assets/images/frame", &err);
+    m_bmpLoading = gpd->graphics->loadBitmap("assets/images/loading", &err);
+    m_bmpMapCursor = gpd->graphics->loadBitmap("assets/images/cursor", &err);
+    m_bmpOverview = gpd->graphics->newBitmap(OVERVIEW_BITMAP_WIDTH, OVERVIEW_BITMAP_HEIGHT, kColorWhite);
+    for (int i = 0; i < MAP_INFO_COUNT; i++)
+    {
+        m_bmpMaps[i] = gpd->graphics->newBitmap(MAP_BITMAP_WIDTH, MAP_BITMAP_HEIGHT, kColorWhite);
+    }
 }
 
 
 ///
 CityInfo::~CityInfo()
 {
-    gpd->graphics->freeBitmap(m_opOverview);
-    gpd->graphics->freeBitmap(m_opMapCursor);
+    gpd->graphics->freeBitmap(m_bmpFrame);
+    gpd->graphics->freeBitmap(m_bmpLoading);
+    gpd->graphics->freeBitmap(m_bmpMapCursor);
+    gpd->graphics->freeBitmap(m_bmpOverview);
     for (int i = 0; i < MAP_INFO_COUNT; i++)
     {
-        gpd->graphics->freeBitmap(m_opMaps[i]);
+        gpd->graphics->freeBitmap(m_bmpMaps[i]);
     }
 }
 
@@ -361,11 +444,19 @@ const char* CityInfo::MAP_DESCS[MAP_INFO_COUNT] = {
 
 
 ///
-void CityInfo::Initialize()
+void CityInfo::InitializeCityInfo()
 {
-    DrawContextCurrentMap();
-    DrawContextCityOverview();
-    UpdateSelectedMap(0);
+    m_bmpMapCurrent = 0;
+    m_bmpMapLast = NULL;
+    m_nMapSelected = 0;
+    m_bmpMapCurrent = NULL;
+    m_bmpMapLast = NULL;
+    m_nStartPosY = 0;
+    m_nEndPosY = 0;
+    m_nCurrentTime = 0;
+
+    m_spCityOverview = std::make_shared<CityOverview>();
+    DrawNowLoading();
 }
 
 

@@ -23,6 +23,9 @@ private:
     std::shared_ptr<CityInfo> m_spCityInfo;
 
     ///
+    std::shared_ptr<CityInfo> m_spCityInfoActive;
+
+    ///
     LCDBitmap* m_bmpMenu;
 
 

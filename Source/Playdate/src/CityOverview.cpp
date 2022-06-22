@@ -122,43 +122,33 @@ void CityOverview::UpdatConnectionsOverview()
 
 ///
 CityOverview::CityOverview()
+: nPopulation(0)
+, nResidential(0)
+, nCommercial(0)
+, nIndustrial(0)
+, nPowerplant(0)
+, nPark(0)
+, nPoliceDept(0)
+, nFireDept(0)
+, nStadium(0)
+, nRoads(0)
+, nPowerline(0)
 {
-    ClearOverview();
-}
-
-
-///
-void CityOverview::ClearOverview()
-{
-    nPopulation = 0;
-
-    nResidential = 0;
-    nCommercial = 0;
-    nIndustrial = 0;
-
-    nPowerplant = 0;
-    nPark = 0;
-    nPoliceDept = 0;
-    nFireDept = 0;
-    nStadium = 0;
-
-    nRoads = 0;
-    nPowerline = 0;
 }
 
 
 ///
 void CityOverview::UpdateOverview()
 {
-    ClearOverview();
-
     nPopulation = (State.residentialPopulation + State.commercialPopulation + State.residentialPopulation) * POPULATION_MULTIPLIER;
-
     UpdateBuildingsOverview();
     UpdatConnectionsOverview();
 
 #ifndef NDEBUG
-//    DebugOut();
+#ifdef _WIN32
+    //_sleep(5000);
+#endif
+    //DebugOut();
 #endif
 }
 

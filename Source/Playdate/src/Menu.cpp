@@ -24,6 +24,7 @@ void Menu::Initialize(const std::shared_ptr<BuildingScore>& buildingScore)
 {
     m_spDrawMap = std::make_shared<DrawMap>();
     m_spDrawMap->Initialize(buildingScore);
+    m_spCityInfo = std::make_shared<CityInfo>(m_spDrawMap);
 
     m_bmpMenu = gpd->graphics->newBitmap(400, 240, kColorWhite);
 }
@@ -55,23 +56,23 @@ LCDBitmap* Menu::GetMenuBitmap()
 ///
 void Menu::OnMenuCityInfo()
 {
-    m_spCityInfo = std::make_shared<CityInfo>(m_spDrawMap);
-    m_spCityInfo->Initialize();
     assert(m_spCityInfo);
+    m_spCityInfo->InitializeCityInfo();
+    m_spCityInfoActive = m_spCityInfo;
 }
 
 
 ///
 void Menu::OnExitCityInfo()
 {
-    m_spCityInfo = NULL;
+    m_spCityInfoActive = NULL;
 }
 
 
 ///
 std::shared_ptr<CityInfo>& Menu::GetCityInfo()
 {
-    return m_spCityInfo;
+    return m_spCityInfoActive;
 }
 
 
