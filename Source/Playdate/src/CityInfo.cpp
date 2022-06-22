@@ -262,7 +262,7 @@ void CityInfo::DrawNowLoading()
 
     gpd->graphics->drawBitmap(m_bmpFrame, OVERVIEW_BITMAP_WIDTH, 0, kBitmapUnflipped);
     gpd->graphics->fillRect(0, 0, 400, 240, (LCDColor)bg);
-    gpd->graphics->drawBitmap(m_bmpLoading, 200 - 9, 120 - 13, kBitmapUnflipped);
+    gpd->graphics->drawBitmap(m_bmpLoading, 176, 96, kBitmapUnflipped);
 }
 
 
