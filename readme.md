@@ -2,11 +2,22 @@
 
 ![Demo](Images/demo.gif)
 
-MicroCity is a city simulation game for the [Arduboy miniature game system](https://www.arduboy.com) inspired by SimCity
+City simulator game for microcontrollers
+
+[日本語](readme-jp.md)
+
+## MicroCity for Playdate
 
 MicroCity for Playdate is a forked from [jhhoward/MicroCity](https://github.com/jhhoward/MicroCity)
 
-## Building MicroCity for Playdate
+## Download
 
-Open Playdate.code-workspace in Visual Studio Code to load the project for Playdate.
+Download the latest version from [releases](releases).
 
+## Install guide
+
+[Sideloading a game on the Playdate console](https://help.play.date/games/sideloading/)
+
+## How to build
+
+Open [Playdate.code-workspace](Playdate.code-workspace) in Visual Studio Code to load the project for Playdate.
