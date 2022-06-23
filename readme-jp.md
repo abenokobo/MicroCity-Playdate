@@ -12,7 +12,7 @@ MicroCity for Playdate は [jhhoward/MicroCity](https://github.com/jhhoward/Micr
 
 ## ダウンロード
 
-[releases](releases) から最新版をダウンロードしてください。
+[releases](https://github.com/abenokobo/MicroCity-Playdate/releases) から最新の MicroCity.pdx.zip をダウンロードしてください。
 
 ## インストール
 

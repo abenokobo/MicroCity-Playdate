@@ -12,7 +12,7 @@ MicroCity for Playdate is a forked from [jhhoward/MicroCity](https://github.com/
 
 ## Download
 
-Download the latest version from [releases](releases).
+Download the latest MicroCity.pdx.zip from [releases](https://github.com/abenokobo/MicroCity-Playdate/releases).
 
 ## Install guide
 
