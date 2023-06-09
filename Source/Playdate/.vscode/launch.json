@@ -4,6 +4,8 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        
+        
         {
             "name": "Playdate Debug",
             "type": "cppdbg",
@@ -11,7 +13,6 @@
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
-            "miDebuggerPath": "${env:PLAYDATE_MINGW}/bin/gdb.exe",
             "preLaunchTask": "",
             "windows": {
                 "MIMode": "gdb",
@@ -20,7 +21,6 @@
                 "externalConsole": true,
             },
             "osx": {
-                "type": "lldb",
                 "MIMode": "lldb",
                 "program": "${env:HOME}/Developer/PlaydateSDK/bin/Playdate Simulator.app/Contents/MacOS/Playdate Simulator",
                 "args": ["MicroCity.pdx"],

@@ -1,12 +1,12 @@
 [
-    {
-      "name": "Playdate Simulator",
-      "toolchainFile": "${workspaceFolder}/.vscode/playdate-simulator.cmake"
-    },
-    {
-      "name": "Playdate Device",
-      "toolchainFile": "${workspaceFolder}/.vscode/playdate-device.cmake"
-    }
+  {
+    "name": "Playdate Simulator",
+    "toolchainFile": "${workspaceFolder}/.vscode/playdate_simulator.cmake"
+  },
+  {
+    "name": "Playdate Device",
+    "toolchainFile": "${workspaceFolder}/.vscode/arm.patched.cmake"
+  }
 ]
 
 

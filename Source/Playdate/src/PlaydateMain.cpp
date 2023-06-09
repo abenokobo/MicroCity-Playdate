@@ -44,3 +44,10 @@ extern "C" int eventHandler
 }
 
 
+// undefined reference
+extern "C" void __dso_handle(void)
+{
+}
+
+
+
