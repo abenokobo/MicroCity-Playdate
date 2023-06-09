@@ -15,6 +15,7 @@
             "environment": [],
             "preLaunchTask": "",
             "windows": {
+                "miDebuggerPath": "${env:PLAYDATE_MINGW}/bin/gdb.exe",
                 "MIMode": "gdb",
                 "program": "${env:PLAYDATE_SDK_PATH}/bin/PlaydateSimulator.exe",
                 "args": ["${workspaceFolder}/MicroCity.pdx"],
